@@ -6,6 +6,7 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	. "hello-go/config"
 	"log"
 )
 
@@ -13,7 +14,11 @@ var Db *sql.DB
 
 func init() {
 	var err error
-	Db, err = sql.Open("mysql", "admin:bHKk6#Tx37#K8cT*@tcp(192.168.2.37:3306)/chitchat?charset=utf8&parseTime=true")
+	config := LoadConfig() // 加载全局配置实例
+	driver := config.Db.Driver
+	source := fmt.Sprintf("%s:%s@(%s)/%s?charset=utf8&parseTime=true", config.Db.User, config.Db.Password,
+		config.Db.Address, config.Db.Database)
+	Db, err = sql.Open(driver, source)
 	if err != nil {
 		log.Fatal(err)
 	}
