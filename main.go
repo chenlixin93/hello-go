@@ -1,28 +1,32 @@
 package main
 
 import (
-	"fmt"
+	. "hello-go/routes"
 	"log"
 	"net/http"
-	"strings"
 )
 
-func sayHelloWorld(w http.ResponseWriter, r *http.Request) {
-	r.ParseForm() //解析参数
-	fmt.Println(r.Form) //在服务端打印请求参数
-	fmt.Println("URL:", r.URL.Path) //请求URL
-	fmt.Println("Scheme:", r.URL.Scheme)
-
-	for k, v := range r.Form {
-		fmt.Println(k, ":", strings.Join(v, ""))
-	}
-	fmt.Fprintf(w, "你好，世界！") //发送响应到客户端
+func main()  {
+	startWebServer("8080")
 }
 
-func main() {
-	http.HandleFunc("/", sayHelloWorld)
-	err := http.ListenAndServe(":9091", nil)
+// 通过指定端口启动 Web 服务器
+func startWebServer(port string)  {
+	r := NewRouter() // 通过 router.go 中定义的路由器来分发请求
+
+	// 处理静态资源文件
+	// 将 /static/ 前缀的 URL 请求去除 static 前缀，
+	// 然后在文件服务器查找指定文件路径是否存在（public 目录下的相对地址）。
+	assets := http.FileServer(http.Dir("public"))
+	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", assets))
+
+	http.Handle("/", r) // 应用路由器到 HTTP 服务器
+
+	log.Println("Starting HTTP service at " + port)
+	err := http.ListenAndServe(":" + port, nil) // 启动协程监听请求
+
 	if err != nil {
-		log.Fatal("ListenAndServe：", err)
+		log.Println("An error occured starting HTTP listener at port " + port)
+		log.Println("Error: " + err.Error())
 	}
 }
