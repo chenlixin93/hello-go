@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"fmt"
+	"github.com/nicksnyder/go-i18n/v2/i18n"
 	"hello-go/models"
 	"net/http"
 )
@@ -47,7 +48,10 @@ func ReadThread(writer http.ResponseWriter, request *http.Request) {
 	uuid := vals.Get("id")
 	thread, err := models.ThreadByUUID(uuid)
 	if err != nil {
-		error_message(writer, request, "Cannot read thread")
+		msg := localizer.MustLocalize(&i18n.LocalizeConfig{
+			MessageID: "thread_not_found",
+		})
+		errorMessage(writer, request, msg)
 	} else {
 		_, err := session(writer, request)
 		if err != nil {
