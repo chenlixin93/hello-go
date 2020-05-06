@@ -12,7 +12,7 @@ type Thread struct {
 
 // format the CreatedAt date to display nicely on the screen
 func (thread *Thread) CreatedAtDate() string {
-	return thread.CreatedAt.Format("May 1, 2020 at 3:00pm")
+	return thread.CreatedAt.Format("Jan 2, 2006 at 3:04pm")
 }
 
 // get the number of posts in a thread
